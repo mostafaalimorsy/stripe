@@ -7,12 +7,16 @@ import 'package:stripe/controller/cubit/cubit.dart';
 import 'package:stripe/controller/cubit/status.dart';
 import 'package:stripe/controller/helper/bloc_observe.dart';
 import 'package:stripe/view/screen/mainScreen.dart';
+// import 'package:stripe_payment/stripe_payment.dart';
+import 'controller/services/.env';
 
-void main() {
+void main() async {
   WidgetsFlutterBinding.ensureInitialized();
   // StripeServices.init();
-  Stripe.publishableKey =
-      "pk_test_51NQvOiI41E0DZWo5E1ihflypNxgpBJdavNkVsCxjRgd3rQmDvov1fJn0FYkuEWOOzgpYGZVMFwu0yzrvvM8jZv2D00uIvbnsDY";
+
+  Stripe.publishableKey = publishKey;
+  // await Stripe.instance.applySettings();
+
   BlocOverrides.runZoned(
     () {
       runApp(const MyApp());
@@ -38,7 +42,6 @@ class MyApp extends StatelessWidget {
             title: 'Stripe integration',
             theme: ThemeData(
               colorScheme: ColorScheme.fromSeed(seedColor: Colors.deepPurple),
-              useMaterial3: true,
             ),
             home: const MainScreen(),
           );
