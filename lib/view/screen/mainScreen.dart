@@ -4,6 +4,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:stripe/controller/cubit/cubit.dart';
 import 'package:stripe/controller/cubit/status.dart';
+import 'package:stripe/view/screen/cartScreen.dart';
 
 class MainScreen extends StatelessWidget {
   const MainScreen({Key? key}) : super(key: key);
@@ -13,14 +14,15 @@ class MainScreen extends StatelessWidget {
     return BlocConsumer<PaymentCubit, PaymentStates>(
       listener: (BuildContext context, state) {},
       builder: (BuildContext context, PaymentStates state) {
-        PaymentCubit getData = PaymentCubit.get(context);
+        // PaymentCubit getData = PaymentCubit.get(context);
         return Scaffold(
           body: Center(
               child: ElevatedButton(
                   onPressed: () async {
-                    getData.makePayment();
+                    // Navigator.push(context, CartScreen());
+                    Navigator.of(context).push(MaterialPageRoute(builder: (context) => CartScreen()));
                   },
-                  child: const Text("Pay"))),
+                  child: const Text("Cart"))),
         );
       },
     );
