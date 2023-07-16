@@ -16,13 +16,8 @@ void main() async {
 
   Stripe.publishableKey = publishKey;
   // await Stripe.instance.applySettings();
-
-  BlocOverrides.runZoned(
-    () {
-      runApp(const MyApp());
-    },
-    blocObserver: MyBlocObserver(),
-  );
+  Bloc.observer = MyBlocObserver();
+  runApp(const MyApp());
 }
 
 class MyApp extends StatelessWidget {
