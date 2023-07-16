@@ -19,3 +19,37 @@ class DisplayPaymentStateLoading extends PaymentStates {}
 class DisplayPaymentStateSuccess extends PaymentStates {}
 
 class DisplayPaymentStateError extends PaymentStates {}
+
+class AddCartItemStateLoading extends PaymentStates {}
+
+class AddCartItemStateSuccess extends PaymentStates {}
+
+class AddCartItemStateError extends PaymentStates {}
+
+class CalcTotalItemStateLoading extends PaymentStates {}
+
+class CalcTotalItemStateSuccess extends PaymentStates {}
+
+class CalcTotalItemStateError extends PaymentStates {}
+
+class ClacSubTotalStateLoading extends PaymentStates {}
+
+class ClacSubTotalStateSuccess extends PaymentStates {}
+
+class ClacSubTotalStateError extends PaymentStates {}
+
+class ClearCartStateLoading extends PaymentStates {}
+
+class ClearCartStateSuccess extends PaymentStates {}
+
+class ClearCartStateError extends PaymentStates {}
+
+class ClacTotalStateSuccess extends PaymentStates {}
+
+class ClacTotalStateError extends PaymentStates {}
+
+class ClacTaxStateLoading extends PaymentStates {}
+
+class ClacTaxStateSuccess extends PaymentStates {}
+
+class ClacTaxStateError extends PaymentStates {}
