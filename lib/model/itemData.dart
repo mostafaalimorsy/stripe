@@ -1,10 +1,10 @@
 // ignore_for_file: file_names
 
-class Items {
+class CartItems {
   String? itemName;
-  String? amount;
-  Items({
-    this.itemName,
-    this.amount,
-  });
+  double? qty;
+  double? price;
+  double? total;
+
+  CartItems({required this.itemName, required this.qty, required this.price, this.total});
 }
