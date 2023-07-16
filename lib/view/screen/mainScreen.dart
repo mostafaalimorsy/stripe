@@ -14,15 +14,23 @@ class MainScreen extends StatelessWidget {
     return BlocConsumer<PaymentCubit, PaymentStates>(
       listener: (BuildContext context, state) {},
       builder: (BuildContext context, PaymentStates state) {
-        // PaymentCubit getData = PaymentCubit.get(context);
+        PaymentCubit getData = PaymentCubit.get(context);
         return Scaffold(
+          appBar: AppBar(
+            actions: [
+              InkWell(
+                  onTap: () {
+                    Navigator.of(context).push(MaterialPageRoute(builder: (context) => const CartScreen()));
+                  },
+                  child: const Icon(Icons.shopping_bag_outlined))
+            ],
+          ),
           body: Center(
               child: ElevatedButton(
                   onPressed: () async {
-                    // Navigator.push(context, CartScreen());
-                    Navigator.of(context).push(MaterialPageRoute(builder: (context) => CartScreen()));
+                    getData.addCardItem();
                   },
-                  child: const Text("Cart"))),
+                  child: const Text("Add To Cart "))),
         );
       },
     );
