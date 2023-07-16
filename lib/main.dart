@@ -41,7 +41,9 @@ class MyApp extends StatelessWidget {
           return MaterialApp(
             title: 'Stripe integration',
             theme: ThemeData(
-              colorScheme: ColorScheme.fromSeed(seedColor: Colors.deepPurple),
+              colorScheme: ColorScheme.fromSeed(
+                seedColor: Colors.indigo.shade600,
+              ),
             ),
             home: const MainScreen(),
           );
