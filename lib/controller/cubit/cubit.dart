@@ -5,24 +5,35 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_stripe/flutter_stripe.dart';
 import 'package:stripe/controller/cubit/status.dart';
-import 'package:stripe/controller/services/.env';
 
 class PaymentCubit extends Cubit<PaymentStates> {
   PaymentCubit() : super(InitialPaymentStates());
   static PaymentCubit get(context) => BlocProvider.of(context);
 
   static Map<String, dynamic>? paymentIntent;
-  Future<void> makePayment() async {
+  Future<void> makePayment({total}) async {
     emit(MakePaymentStateLoading());
     try {
       //STEP 1: Create Payment Intent
-      paymentIntent = await createPaymentIntent('100', 'USD');
+      paymentIntent = await createPaymentIntent('$total', 'USD');
 
       //STEP 2: Initialize Payment Sheet
 
       await Stripe.instance
           .initPaymentSheet(
               paymentSheetParameters: SetupPaymentSheetParameters(
+                  appearance: PaymentSheetAppearance(
+                    primaryButton: PaymentSheetPrimaryButtonAppearance(
+                      colors: PaymentSheetPrimaryButtonTheme(
+                        light: PaymentSheetPrimaryButtonThemeColors(
+                          background: Colors.indigo.shade600,
+                        ),
+                        dark: PaymentSheetPrimaryButtonThemeColors(
+                          background: Colors.indigo.shade600,
+                        ),
+                      ),
+                    ),
+                  ),
                   paymentIntentClientSecret: paymentIntent!['client_secret'], //Gotten from payment intent
                   style: ThemeMode.light,
                   merchantDisplayName: 'Autonomo'))
