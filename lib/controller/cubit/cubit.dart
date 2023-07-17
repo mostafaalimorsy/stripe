@@ -1,8 +1,11 @@
+// ignore_for_file: prefer_typing_uninitialized_variables
+
 import 'dart:convert';
 import 'package:http/http.dart' as http;
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_stripe/flutter_stripe.dart';
+import 'package:pay/pay.dart';
 import 'package:stripe/controller/cubit/status.dart';
 import 'package:stripe/model/itemData.dart';
 
@@ -15,7 +18,7 @@ class PaymentCubit extends Cubit<PaymentStates> {
   double cartTotal = 0;
   double cartTax = 0;
   double cartSubTotal = 0;
-
+  var paymentItems;
 //add items to cart list
   void addCardItem({data, tax}) {
     emit(AddCartItemStateLoading());
@@ -121,6 +124,7 @@ class PaymentCubit extends Cubit<PaymentStates> {
     try {
       //STEP 1: Create Payment Intent
       dynamic result = (total * 100).toInt();
+
       paymentIntent = await createPaymentIntent("$result", 'USD');
 
       //STEP 2: Initialize Payment Sheet
@@ -128,6 +132,7 @@ class PaymentCubit extends Cubit<PaymentStates> {
       await Stripe.instance
           .initPaymentSheet(
               paymentSheetParameters: SetupPaymentSheetParameters(
+                  // applePay: PaymentSheetApplePay.fromJson(defaultGooglePay),
                   appearance: PaymentSheetAppearance(
                     primaryButton: PaymentSheetPrimaryButtonAppearance(
                       colors: PaymentSheetPrimaryButtonTheme(
@@ -211,5 +216,33 @@ class PaymentCubit extends Cubit<PaymentStates> {
       print('$e');
       emit(DisplayPaymentStateError());
     }
+  }
+
+  // Future<void> makePlatformPayment() async {
+  //   emit(CreatePaymentPlatformStateLoading());
+  //   try {
+  //     paymentItems = [
+  //       PaymentItem(
+  //         label: 'Total',
+  //         amount: "$cartSubTotal",
+  //         status: PaymentItemStatus.final_price,
+  //       )
+  //     ];
+  //     emit(CreatePaymentPlatformStateSuccess());
+  //   } catch (e) {
+  //     print(e);
+  //     emit(CreatePaymentPlatformStateError());
+  //   }
+  // }
+
+  void onApplePayResult(paymentResult) {
+    // Send the resulting Apple Pay token to your server / PSP
+
+    print(paymentResult['token']);
+  }
+
+  void onGooglePayResult(paymentResult) {
+    // Send the resulting Google Pay token to your server / PSP
+    print(paymentResult['token']);
   }
 }

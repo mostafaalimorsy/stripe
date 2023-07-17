@@ -53,3 +53,9 @@ class ClacTaxStateLoading extends PaymentStates {}
 class ClacTaxStateSuccess extends PaymentStates {}
 
 class ClacTaxStateError extends PaymentStates {}
+
+class CreatePaymentPlatformStateLoading extends PaymentStates {}
+
+class CreatePaymentPlatformStateSuccess extends PaymentStates {}
+
+class CreatePaymentPlatformStateError extends PaymentStates {}

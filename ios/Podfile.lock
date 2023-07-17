@@ -1,5 +1,7 @@
 PODS:
   - Flutter (1.0.0)
+  - pay_ios (0.0.1):
+    - Flutter
   - Stripe (23.7.1):
     - StripeApplePay (= 23.7.1)
     - StripeCore (= 23.7.1)
@@ -39,6 +41,7 @@ PODS:
 
 DEPENDENCIES:
   - Flutter (from `Flutter`)
+  - pay_ios (from `.symlinks/plugins/pay_ios/ios`)
   - stripe_ios (from `.symlinks/plugins/stripe_ios/ios`)
 
 SPEC REPOS:
@@ -55,11 +58,14 @@ SPEC REPOS:
 EXTERNAL SOURCES:
   Flutter:
     :path: Flutter
+  pay_ios:
+    :path: ".symlinks/plugins/pay_ios/ios"
   stripe_ios:
     :path: ".symlinks/plugins/stripe_ios/ios"
 
 SPEC CHECKSUMS:
   Flutter: f04841e97a9d0b0a8025694d0796dd46242b2854
+  pay_ios: 8c7beb9c61d885f3f51b61f75f8793023fc8843a
   Stripe: fbe3d1d61cba70ac7a920c6097222ba9525352c4
   stripe_ios: 8e0be46c31e1758756e5fdc1613f751d4d945ae0
   StripeApplePay: 06e3899c9db102567804b77c41cec2861b5e2c39
