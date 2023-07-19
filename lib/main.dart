@@ -13,9 +13,10 @@ import 'controller/services/.env';
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
   // StripeServices.init();
-
-  Stripe.publishableKey = publishKey;
+  Stripe.merchantIdentifier = 'merchant.flutter.stripe.test';
+  Stripe.urlScheme = 'flutterstripe';
   // await Stripe.instance.applySettings();
+  Stripe.publishableKey = publishKey;
   Bloc.observer = MyBlocObserver();
   runApp(const MyApp());
 }

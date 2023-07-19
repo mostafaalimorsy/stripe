@@ -19,6 +19,12 @@ class PaymentCubit extends Cubit<PaymentStates> {
   double cartTax = 0;
   double cartSubTotal = 0;
   var paymentItems;
+  String result = "";
+  late final googlePayMap;
+  late final applePayMap;
+
+  // Create a SetupPaymentSheetParameters object with the desired options
+
 //add items to cart list
   void addCardItem({data, tax}) {
     emit(AddCartItemStateLoading());
@@ -33,6 +39,70 @@ class PaymentCubit extends Cubit<PaymentStates> {
       cartSubTotal = calcTotalPriceOfItems();
       cartTax = calcTax(tax: tax);
       cartTotal = calcTotal(tax: tax);
+      result = ((cartTotal * 100).toInt()).toString();
+
+      googlePayMap = {
+        "provider": "google_pay",
+        "data": {
+          "environment": "TEST",
+          "apiVersion": "2",
+          "apiVersionMinor": "0",
+          "allowedPaymentMethods": [
+            {
+              "type": "CARD",
+              "tokenizationSpecification": {
+                "type": "PAYMENT_GATEWAY",
+                "parameters": {"gateway": "example", "gatewayMerchantId": "gatewayMerchantId"}
+              },
+              "parameters": {
+                "allowedCardNetworks": ["VISA", "MASTERCARD"],
+                "allowedAuthMethods": ["PAN_ONLY", "CRYPTOGRAM_3DS"],
+                "billingAddressRequired": "true",
+                "billingAddressParameters": {"format": "FULL", "phoneNumberRequired": "true"}
+              }
+            }
+          ],
+          "merchantInfo": {"merchantId": "01234567890123456789", "merchantName": "Example Merchant Name"},
+          "transactionInfo": {
+            "countryCode": "US",
+            "currencyCode": "USD",
+            'totalPrice': "$result",
+          }
+        }
+      };
+      applePayMap = {
+        "provider": "apple_pay",
+        "data": {
+          "merchantIdentifier": "merchant.com.sams.fish",
+          "displayName": "Sam's Fish",
+          "merchantCapabilities": ["3DS", "debit", "credit"],
+          "supportedNetworks": ["amex", "visa", "discover", "masterCard"],
+          "countryCode": "US",
+          "currencyCode": "USD",
+          "requiredBillingContactFields": ["emailAddress", "name", "phoneNumber", "postalAddress"],
+          "requiredShippingContactFields": [],
+          "shippingMethods": [
+            {
+              "amount": "0.00",
+              "detail": "Available within an hour",
+              "identifier": "in_store_pickup",
+              "label": "In-Store Pickup"
+            },
+            {
+              "amount": "4.99",
+              "detail": "5-8 Business Days",
+              "identifier": "flat_rate_shipping_id_2",
+              "label": "UPS Ground"
+            },
+            {
+              "amount": "29.99",
+              "detail": "1-3 Business Days",
+              "identifier": "flat_rate_shipping_id_1",
+              "label": "FedEx Priority Mail"
+            }
+          ]
+        }
+      };
       emit(AddCartItemStateSuccess());
     } catch (e) {
       print(e.toString());
@@ -123,31 +193,48 @@ class PaymentCubit extends Cubit<PaymentStates> {
     emit(MakePaymentStateLoading());
     try {
       //STEP 1: Create Payment Intent
-      dynamic result = (total * 100).toInt();
 
       paymentIntent = await createPaymentIntent("$result", 'USD');
 
       //STEP 2: Initialize Payment Sheet
-
+      String result2 = result;
       await Stripe.instance
           .initPaymentSheet(
-              paymentSheetParameters: SetupPaymentSheetParameters(
-                  // applePay: PaymentSheetApplePay.fromJson(defaultGooglePay),
-                  appearance: PaymentSheetAppearance(
-                    primaryButton: PaymentSheetPrimaryButtonAppearance(
-                      colors: PaymentSheetPrimaryButtonTheme(
-                        light: PaymentSheetPrimaryButtonThemeColors(
-                          background: Colors.indigo.shade600,
-                        ),
-                        dark: PaymentSheetPrimaryButtonThemeColors(
-                          background: Colors.indigo.shade600,
-                        ),
-                      ),
-                    ),
+        paymentSheetParameters: SetupPaymentSheetParameters(
+            // applePay: PaymentSheetApplePay(merchantCountryCode: 'US', buttonType: PlatformButtonType.pay, cartItems: [
+            //   ApplePayCartSummaryItem.immediate(
+            //     label: 'Autonomo',
+            //     amount: "$result",
+            //   )
+            // ]),
+            customerEphemeralKeySecret: paymentIntent!['ephemeralKey'],
+            customerId: paymentIntent!['customer'],
+            primaryButtonLabel: 'Pay now',
+            // payPal:,
+            applePay: const PaymentSheetApplePay(
+              merchantCountryCode: 'US',
+            ),
+            googlePay: const PaymentSheetGooglePay(
+              merchantCountryCode: 'US',
+              testEnv: true,
+            ),
+            // googlePay: const PaymentSheetGooglePay(merchantCountryCode: "US", currencyCode: "USD", testEnv: true),
+            appearance: PaymentSheetAppearance(
+              primaryButton: PaymentSheetPrimaryButtonAppearance(
+                colors: PaymentSheetPrimaryButtonTheme(
+                  light: PaymentSheetPrimaryButtonThemeColors(
+                    background: Colors.indigo.shade600,
                   ),
-                  paymentIntentClientSecret: paymentIntent!['client_secret'], //Gotten from payment intent
-                  style: ThemeMode.light,
-                  merchantDisplayName: 'Autonomo'))
+                  dark: PaymentSheetPrimaryButtonThemeColors(
+                    background: Colors.indigo.shade600,
+                  ),
+                ),
+              ),
+            ),
+            paymentIntentClientSecret: paymentIntent!['client_secret'], //Gotten from payment intent
+            style: ThemeMode.light,
+            merchantDisplayName: 'Autonomo'),
+      )
           .then((value) {
         print("Success =========>");
       });
@@ -219,7 +306,7 @@ class PaymentCubit extends Cubit<PaymentStates> {
   }
 
   // Future<void> makePlatformPayment() async {
-  //   emit(CreatePaymentPlatformStateLoading());
+  //
   //   try {
   //     paymentItems = [
   //       PaymentItem(
@@ -235,14 +322,22 @@ class PaymentCubit extends Cubit<PaymentStates> {
   //   }
   // }
 
-  void onApplePayResult(paymentResult) {
-    // Send the resulting Apple Pay token to your server / PSP
-
-    print(paymentResult['token']);
-  }
-
-  void onGooglePayResult(paymentResult) {
-    // Send the resulting Google Pay token to your server / PSP
-    print(paymentResult['token']);
-  }
+  // Future<Map<String, dynamic>> createPaymentIntentPayPal() async {
+  //   emit(CreatePaymentPlatformStateLoading());
+  //   final url = Uri.parse('https://api.stripe.com/v1/create-payment-intent');
+  //   final response = await http.post(
+  //     url,
+  //     headers: {
+  //       'Content-Type': 'application/json',
+  //     },
+  //     body: json.encode({
+  //       'currency': 'USD',
+  //       'payment_method_types': ['paypal'],
+  //       'amount': result
+  //     }),
+  //   );
+  //   emit(CreatePaymentPlatformStateSuccess());
+  //   print(response.body);
+  //   return json.decode(response.body);
+  // }
 }

@@ -120,53 +120,12 @@ class CartScreen extends StatelessWidget {
                 SizedBox(
                   height: ResponsiveSize.size(context: context, sizeNumber: 10, isHeight: true),
                 ),
-                if (Platform.isIOS)
-                  Center(
-                    child: ApplePayButton(
-                      width: ResponsiveSize.size(context: context, sizeNumber: 350, isHeight: false),
-                      height: ResponsiveSize.size(context: context, sizeNumber: 50, isHeight: true),
-                      paymentConfiguration: PaymentConfiguration.fromJsonString(defaultApplePay),
-                      paymentItems: [
-                        PaymentItem(
-                          label: 'Autonomo',
-                          amount: "${getData.cartTotal}",
-                          status: PaymentItemStatus.final_price,
-                        )
-                      ],
-                      style: ApplePayButtonStyle.black,
-                      type: ApplePayButtonType.buy,
-                      margin: const EdgeInsets.only(top: 15.0),
-                      onPaymentResult: getData.onApplePayResult,
-                      loadingIndicator: const Center(
-                        child: CircularProgressIndicator(),
-                      ),
-                    ),
-                  ),
-                if (Platform.isAndroid)
-                  Center(
-                    child: GooglePayButton(
-                      width: ResponsiveSize.size(context: context, sizeNumber: 350, isHeight: false),
-                      height: ResponsiveSize.size(context: context, sizeNumber: 50, isHeight: true),
-                      paymentConfiguration: PaymentConfiguration.fromJsonString(defaultGooglePay),
-                      paymentItems: [
-                        PaymentItem(
-                          label: 'Autonomo',
-                          amount: "${getData.cartTotal}",
-                          status: PaymentItemStatus.final_price,
-                        )
-                      ],
-                      type: GooglePayButtonType.pay,
-                      margin: const EdgeInsets.only(top: 15.0),
-                      onPaymentResult: getData.onGooglePayResult,
-                      loadingIndicator: const Center(
-                        child: CircularProgressIndicator(),
-                      ),
-                    ),
-                  ),
+
                 SizedBox(
                   height: ResponsiveSize.size(context: context, sizeNumber: 20, isHeight: true),
                 ),
                 //button to pay
+
                 Center(
                   child: InkWell(
                     onTap: () {
