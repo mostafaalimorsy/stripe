@@ -20,7 +20,7 @@ class MainScreen extends StatelessWidget {
             actions: [
               InkWell(
                   onTap: () {
-                    Navigator.of(context).push(MaterialPageRoute(builder: (context) => const CartScreen()));
+                    Navigator.of(context).push(MaterialPageRoute(builder: (context) => CartScreen()));
                   },
                   child: const Icon(Icons.shopping_bag_outlined))
             ],

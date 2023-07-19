@@ -1,21 +1,16 @@
-// ignore_for_file: file_names
-
-import 'dart:io';
+// ignore_for_file: file_names, must_be_immutable
 
 import 'package:conditional_builder_null_safety/conditional_builder_null_safety.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:pay/pay.dart';
 import 'package:stripe/controller/cubit/cubit.dart';
 import 'package:stripe/controller/cubit/status.dart';
 import 'package:stripe/controller/services/calcSize.dart';
 import 'package:stripe/controller/services/commonUtlity.dart';
-import 'package:stripe/controller/services/payment_config.dart';
-// import 'payment_config.dart' as payment_configurations;
 
 class CartScreen extends StatelessWidget {
-  const CartScreen({Key? key}) : super(key: key);
-
+  CartScreen({Key? key}) : super(key: key);
+  final TextEditingController _couponCodeController = TextEditingController();
   @override
   Widget build(BuildContext context) {
     return BlocConsumer<PaymentCubit, PaymentStates>(
@@ -27,6 +22,7 @@ class CartScreen extends StatelessWidget {
       builder: (BuildContext context, PaymentStates state) {
         PaymentCubit getData = PaymentCubit.get(context);
         return Scaffold(
+          resizeToAvoidBottomInset: false,
           backgroundColor: Colors.black,
           appBar: AppBar(
             backgroundColor: Colors.black,
@@ -66,54 +62,146 @@ class CartScreen extends StatelessWidget {
                   height: ResponsiveSize.size(context: context, sizeNumber: 35, isHeight: true),
                 ),
                 //bill view
+                SingleChildScrollView(
+                  child: Padding(
+                    padding: EdgeInsets.symmetric(
+                      horizontal: ResponsiveSize.size(context: context, sizeNumber: 35, isHeight: false),
+                    ),
+                    child: Container(
+                      padding: EdgeInsets.symmetric(
+                        horizontal: ResponsiveSize.size(context: context, sizeNumber: 35, isHeight: false),
+                      ),
+                      width: double.infinity,
+                      decoration: BoxDecoration(
+                        color: Colors.grey.withOpacity(.1),
+                        borderRadius: BorderRadius.circular(5),
+                        border: Border.all(
+                          color: Colors.grey.withOpacity(.4),
+                        ),
+                      ),
+                      child: Column(
+                        children: [
+                          //items and prices
+                          LimitedBox(
+                            maxHeight: ResponsiveSize.size(context: context, sizeNumber: 300.0, isHeight: true),
+                            child: ListView.builder(
+                              physics: const BouncingScrollPhysics(),
+                              shrinkWrap: true,
+                              itemCount: getData.cartItem.length,
+                              itemBuilder: (BuildContext context, int index) {
+                                return CommonWidget.billRow(
+                                    context: context,
+                                    rowTitle: "${getData.cartItem[index].itemName}",
+                                    rowValue: "${getData.cartItem[index].total}");
+                              },
+                            ),
+                          ),
+
+                          //Divider
+                          CommonWidget.divider(context: context),
+                          //total
+                          CommonWidget.billRow(
+                              context: context, rowTitle: "Subtotal", rowValue: "${getData.cartSubTotal}"),
+                          //tax
+                          CommonWidget.billRow(context: context, rowTitle: "Tax", rowValue: "${getData.cartTax}"),
+                          //Divider
+                          CommonWidget.divider(context: context),
+                          //total
+                          CommonWidget.billRow(context: context, rowTitle: "Total", rowValue: "${getData.cartTotal}"),
+                        ],
+                      ),
+                    ),
+                  ),
+                ),
+                SizedBox(
+                  height: ResponsiveSize.size(context: context, sizeNumber: 10, isHeight: true),
+                ),
+                //coupon
                 Padding(
                   padding: EdgeInsets.symmetric(
                     horizontal: ResponsiveSize.size(context: context, sizeNumber: 35, isHeight: false),
                   ),
-                  child: Container(
-                    padding: EdgeInsets.symmetric(
-                      horizontal: ResponsiveSize.size(context: context, sizeNumber: 35, isHeight: false),
-                    ),
-                    width: double.infinity,
-                    decoration: BoxDecoration(
-                      color: Colors.grey.withOpacity(.1),
-                      borderRadius: BorderRadius.circular(5),
-                      border: Border.all(
-                        color: Colors.grey.withOpacity(.4),
-                      ),
-                    ),
-                    child: Column(
-                      children: [
-                        //items and prices
-                        LimitedBox(
-                          maxHeight: ResponsiveSize.size(context: context, sizeNumber: 400.0, isHeight: true),
-                          child: ListView.builder(
-                            physics: const BouncingScrollPhysics(),
-                            shrinkWrap: true,
-                            itemCount: getData.cartItem.length,
-                            itemBuilder: (BuildContext context, int index) {
-                              return CommonWidget.billRow(
-                                  context: context,
-                                  rowTitle: "${getData.cartItem[index].itemName}",
-                                  rowValue: "${getData.cartItem[index].total}");
-                            },
+                  child: Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                    children: [
+                      SizedBox(
+                        width: ResponsiveSize.size(context: context, sizeNumber: 240, isHeight: false),
+                        height: ResponsiveSize.size(context: context, sizeNumber: 50, isHeight: false),
+                        child: TextFormField(
+                          style: const TextStyle(color: Colors.white),
+                          controller: _couponCodeController,
+                          decoration: InputDecoration(
+                            enabledBorder: const OutlineInputBorder(
+                              borderSide: BorderSide(
+                                color: Colors.grey,
+                                width: 1.0,
+                              ),
+                            ),
+                            hintStyle: const TextStyle(color: Colors.white),
+                            hintText: 'Enter your coupon code',
+                            border: OutlineInputBorder(
+                              borderSide: BorderSide(
+                                color: Colors.grey.withOpacity(.4),
+                              ),
+                            ),
                           ),
+                          validator: (value) {
+                            if (value!.isEmpty) {
+                              return 'Please enter a coupon code';
+                            }
+                            return null;
+                          },
                         ),
-                        //Divider
-                        CommonWidget.divider(context: context),
-                        //total
+                      ),
+                      SizedBox(
+                        width: ResponsiveSize.size(context: context, sizeNumber: 70, isHeight: false),
+                        height: ResponsiveSize.size(context: context, sizeNumber: 50, isHeight: false),
+                        child: ElevatedButton(
+                          style: ButtonStyle(
+                              backgroundColor: _couponCodeController.text.isNotEmpty
+                                  ? MaterialStateProperty.all<Color>(Colors.indigo.shade600)
+                                  : MaterialStateProperty.all<Color>(
+                                      Colors.grey.withOpacity(.4),
+                                    )),
+                          child: const Text("Apply"),
+                          onPressed: () {
+                            if (_couponCodeController.text.isNotEmpty) {
+                              getData.couponID = _couponCodeController.text;
+                              getData.totalAfterCoupon();
+                            }
+                          },
+                        ),
+                      )
+                    ],
+                  ),
+                ),
+                SizedBox(
+                  height: ResponsiveSize.size(context: context, sizeNumber: 10, isHeight: true),
+                ),
+                if (getData.cartTotalAfterDiscount != 0)
+                  Padding(
+                    padding: EdgeInsets.symmetric(
+                      horizontal: ResponsiveSize.size(context: context, sizeNumber: 60, isHeight: false),
+                    ),
+                    child: Row(
+                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                      children: [
                         CommonWidget.billRow(
-                            context: context, rowTitle: "Subtotal", rowValue: "${getData.cartSubTotal}"),
-                        //tax
-                        CommonWidget.billRow(context: context, rowTitle: "Tax", rowValue: "${getData.cartTax}"),
-                        //Divider
-                        CommonWidget.divider(context: context),
-                        //total
-                        CommonWidget.billRow(context: context, rowTitle: "Total", rowValue: "${getData.cartTotal}"),
+                            context: context,
+                            rowTitle: "Total after Discount is ",
+                            rowValue: "${getData.cartTotalAfterDiscount}"),
+                        InkWell(
+                          onTap: () {
+                            getData.clearCoupon();
+                          },
+                          child: Icon(
+                            Icons.delete,
+                            color: Colors.white,
+                          ),
+                        )
                       ],
                     ),
                   ),
-                ),
                 const Spacer(),
                 //Divider
                 CommonWidget.divider(w: double.infinity, context: context),
@@ -126,7 +214,9 @@ class CartScreen extends StatelessWidget {
                 Center(
                   child: InkWell(
                     onTap: () {
-                      getData.makePayment(total: getData.cartTotal);
+                      getData.makePayment(
+                          total:
+                              getData.cartTotalAfterDiscount == 0 ? getData.cartTotal : getData.cartTotalAfterDiscount);
                     },
                     child: Container(
                       height: ResponsiveSize.size(context: context, sizeNumber: 50, isHeight: true),

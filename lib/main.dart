@@ -13,6 +13,7 @@ import 'controller/services/.env';
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
   Stripe.merchantIdentifier = 'merchant.flutter.stripe.test';
+  Stripe.urlScheme = 'flutterstripe';
   Stripe.publishableKey = publishKey;
   Bloc.observer = MyBlocObserver();
   runApp(const MyApp());
@@ -26,7 +27,7 @@ class MyApp extends StatelessWidget {
   Widget build(BuildContext context) {
     return BlocProvider(
       create: (BuildContext context) {
-        return PaymentCubit();
+        return PaymentCubit()..getDiscountValue();
       },
       child: BlocConsumer<PaymentCubit, PaymentStates>(
         listener: (BuildContext context, state) {},

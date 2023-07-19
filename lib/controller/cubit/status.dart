@@ -59,3 +59,11 @@ class CreatePaymentPlatformStateLoading extends PaymentStates {}
 class CreatePaymentPlatformStateSuccess extends PaymentStates {}
 
 class CreatePaymentPlatformStateError extends PaymentStates {}
+
+class ClacDiscountStateLoading extends PaymentStates {}
+
+class ClacDiscountStateSuccess extends PaymentStates {}
+
+class ClearDiscountStateLoading extends PaymentStates {}
+
+class ClearDiscountStateSuccess extends PaymentStates {}

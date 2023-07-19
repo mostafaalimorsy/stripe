@@ -5,7 +5,6 @@ import 'package:http/http.dart' as http;
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_stripe/flutter_stripe.dart';
-import 'package:pay/pay.dart';
 import 'package:stripe/controller/cubit/status.dart';
 import 'package:stripe/model/itemData.dart';
 
@@ -16,10 +15,13 @@ class PaymentCubit extends Cubit<PaymentStates> {
   static Map<String, dynamic>? paymentIntent;
   List<CartItems> cartItem = [];
   double cartTotal = 0;
+  double cartTotalAfterDiscount = 0;
   double cartTax = 0;
   double cartSubTotal = 0;
   var paymentItems;
   String result = "";
+  String couponID = "";
+  double discountValue = 0;
 
   // Create a SetupPaymentSheetParameters object with the desired options
 
@@ -37,7 +39,6 @@ class PaymentCubit extends Cubit<PaymentStates> {
       cartSubTotal = calcTotalPriceOfItems();
       cartTax = calcTax(tax: tax);
       cartTotal = calcTotal(tax: tax);
-      result = ((cartTotal * 100).toInt()).toString();
 
       emit(AddCartItemStateSuccess());
     } catch (e) {
@@ -115,6 +116,7 @@ class PaymentCubit extends Cubit<PaymentStates> {
       cartTotal = 0;
       cartTax = 0;
       cartSubTotal = 0;
+      cartTotalAfterDiscount = 0;
       emit(ClearCartStateSuccess());
       return true;
     } catch (e) {
@@ -129,11 +131,10 @@ class PaymentCubit extends Cubit<PaymentStates> {
     emit(MakePaymentStateLoading());
     try {
       //STEP 1: Create Payment Intent
-
+      result = ((cartTotalAfterDiscount == 0 ? cartTotal * 100 : cartTotalAfterDiscount * 100).toInt()).toString();
       paymentIntent = await createPaymentIntent("$result", 'USD');
 
       //STEP 2: Initialize Payment Sheet
-      String result2 = result;
       await Stripe.instance
           .initPaymentSheet(
         paymentSheetParameters: SetupPaymentSheetParameters(
@@ -239,5 +240,25 @@ class PaymentCubit extends Cubit<PaymentStates> {
       print('$e');
       emit(DisplayPaymentStateError());
     }
+  }
+
+  void getDiscountValue() {
+    // TODO: get discount value from db by id
+    couponID;
+    discountValue = 10;
+  }
+
+//calc coupon value
+  void totalAfterCoupon() {
+    emit(ClacDiscountStateLoading());
+    cartTotalAfterDiscount = double.parse((cartTotal - (cartTotal * (discountValue / 100))).toStringAsFixed(2));
+    emit(ClacDiscountStateSuccess());
+  }
+
+  void clearCoupon() {
+    emit(ClearDiscountStateLoading());
+    cartTotalAfterDiscount = 0;
+    result = ((cartTotalAfterDiscount == 0 ? cartTotal * 100 : cartTotalAfterDiscount * 100).toInt()).toString();
+    emit(ClearDiscountStateSuccess());
   }
 }
