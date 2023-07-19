@@ -121,9 +121,6 @@ class CartScreen extends StatelessWidget {
                   height: ResponsiveSize.size(context: context, sizeNumber: 10, isHeight: true),
                 ),
 
-                SizedBox(
-                  height: ResponsiveSize.size(context: context, sizeNumber: 20, isHeight: true),
-                ),
                 //button to pay
 
                 Center(

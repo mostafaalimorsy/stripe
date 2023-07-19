@@ -20,8 +20,6 @@ class PaymentCubit extends Cubit<PaymentStates> {
   double cartSubTotal = 0;
   var paymentItems;
   String result = "";
-  late final googlePayMap;
-  late final applePayMap;
 
   // Create a SetupPaymentSheetParameters object with the desired options
 
@@ -41,68 +39,6 @@ class PaymentCubit extends Cubit<PaymentStates> {
       cartTotal = calcTotal(tax: tax);
       result = ((cartTotal * 100).toInt()).toString();
 
-      googlePayMap = {
-        "provider": "google_pay",
-        "data": {
-          "environment": "TEST",
-          "apiVersion": "2",
-          "apiVersionMinor": "0",
-          "allowedPaymentMethods": [
-            {
-              "type": "CARD",
-              "tokenizationSpecification": {
-                "type": "PAYMENT_GATEWAY",
-                "parameters": {"gateway": "example", "gatewayMerchantId": "gatewayMerchantId"}
-              },
-              "parameters": {
-                "allowedCardNetworks": ["VISA", "MASTERCARD"],
-                "allowedAuthMethods": ["PAN_ONLY", "CRYPTOGRAM_3DS"],
-                "billingAddressRequired": "true",
-                "billingAddressParameters": {"format": "FULL", "phoneNumberRequired": "true"}
-              }
-            }
-          ],
-          "merchantInfo": {"merchantId": "01234567890123456789", "merchantName": "Example Merchant Name"},
-          "transactionInfo": {
-            "countryCode": "US",
-            "currencyCode": "USD",
-            'totalPrice': "$result",
-          }
-        }
-      };
-      applePayMap = {
-        "provider": "apple_pay",
-        "data": {
-          "merchantIdentifier": "merchant.com.sams.fish",
-          "displayName": "Sam's Fish",
-          "merchantCapabilities": ["3DS", "debit", "credit"],
-          "supportedNetworks": ["amex", "visa", "discover", "masterCard"],
-          "countryCode": "US",
-          "currencyCode": "USD",
-          "requiredBillingContactFields": ["emailAddress", "name", "phoneNumber", "postalAddress"],
-          "requiredShippingContactFields": [],
-          "shippingMethods": [
-            {
-              "amount": "0.00",
-              "detail": "Available within an hour",
-              "identifier": "in_store_pickup",
-              "label": "In-Store Pickup"
-            },
-            {
-              "amount": "4.99",
-              "detail": "5-8 Business Days",
-              "identifier": "flat_rate_shipping_id_2",
-              "label": "UPS Ground"
-            },
-            {
-              "amount": "29.99",
-              "detail": "1-3 Business Days",
-              "identifier": "flat_rate_shipping_id_1",
-              "label": "FedEx Priority Mail"
-            }
-          ]
-        }
-      };
       emit(AddCartItemStateSuccess());
     } catch (e) {
       print(e.toString());
@@ -209,7 +145,7 @@ class PaymentCubit extends Cubit<PaymentStates> {
             // ]),
             customerEphemeralKeySecret: paymentIntent!['ephemeralKey'],
             customerId: paymentIntent!['customer'],
-            primaryButtonLabel: 'Pay now',
+            // primaryButtonLabel: 'Pay now',
             // payPal:,
             applePay: const PaymentSheetApplePay(
               merchantCountryCode: 'US',
@@ -304,40 +240,4 @@ class PaymentCubit extends Cubit<PaymentStates> {
       emit(DisplayPaymentStateError());
     }
   }
-
-  // Future<void> makePlatformPayment() async {
-  //
-  //   try {
-  //     paymentItems = [
-  //       PaymentItem(
-  //         label: 'Total',
-  //         amount: "$cartSubTotal",
-  //         status: PaymentItemStatus.final_price,
-  //       )
-  //     ];
-  //     emit(CreatePaymentPlatformStateSuccess());
-  //   } catch (e) {
-  //     print(e);
-  //     emit(CreatePaymentPlatformStateError());
-  //   }
-  // }
-
-  // Future<Map<String, dynamic>> createPaymentIntentPayPal() async {
-  //   emit(CreatePaymentPlatformStateLoading());
-  //   final url = Uri.parse('https://api.stripe.com/v1/create-payment-intent');
-  //   final response = await http.post(
-  //     url,
-  //     headers: {
-  //       'Content-Type': 'application/json',
-  //     },
-  //     body: json.encode({
-  //       'currency': 'USD',
-  //       'payment_method_types': ['paypal'],
-  //       'amount': result
-  //     }),
-  //   );
-  //   emit(CreatePaymentPlatformStateSuccess());
-  //   print(response.body);
-  //   return json.decode(response.body);
-  // }
 }
