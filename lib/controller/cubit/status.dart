@@ -67,3 +67,9 @@ class ClacDiscountStateSuccess extends PaymentStates {}
 class ClearDiscountStateLoading extends PaymentStates {}
 
 class ClearDiscountStateSuccess extends PaymentStates {}
+
+class DeleteItemStateSuccess extends PaymentStates {}
+
+class DeleteItemStateLoading extends PaymentStates {}
+
+class DeleteItemStateError extends PaymentStates {}

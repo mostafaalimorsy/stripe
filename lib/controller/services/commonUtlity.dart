@@ -10,7 +10,7 @@ class CommonWidget {
     );
   }
 
-  static Widget billRow({context, rowTitle, rowValue}) {
+  static Widget billRow({context, rowTitle, rowValue, bool enableDeleteItem = false, void Function()? onTap}) {
     return Padding(
       padding: EdgeInsets.symmetric(
         vertical: ResponsiveSize.size(context: context, sizeNumber: 8, isHeight: true),
@@ -34,6 +34,13 @@ class CommonWidget {
               fontSize: ResponsiveSize.size(context: context, sizeNumber: 15, isHeight: true),
             ),
           ),
+          if (enableDeleteItem)
+            InkWell(
+                onTap: onTap,
+                child: const Icon(
+                  Icons.delete,
+                  color: Colors.white,
+                )),
         ],
       ),
     );

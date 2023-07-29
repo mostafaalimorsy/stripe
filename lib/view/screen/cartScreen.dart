@@ -90,6 +90,8 @@ class CartScreen extends StatelessWidget {
                               itemCount: getData.cartItem.length,
                               itemBuilder: (BuildContext context, int index) {
                                 return CommonWidget.billRow(
+                                    enableDeleteItem: true,
+                                    onTap: () => getData.deleteItemOnCart(index),
                                     context: context,
                                     rowTitle: "${getData.cartItem[index].itemName}",
                                     rowValue: "${getData.cartItem[index].total}");

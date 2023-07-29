@@ -22,13 +22,14 @@ class PaymentCubit extends Cubit<PaymentStates> {
   String result = "";
   String couponID = "";
   double discountValue = 0;
+  double tax = 10;
 
   // Create a SetupPaymentSheetParameters object with the desired options
 
 //add items to cart list
-  void addCardItem({data, tax}) {
+  void addCardItem({data}) {
     emit(AddCartItemStateLoading());
-    tax = 10;
+
     try {
       // TODO: change it to (data.name) and (data.price) and (data.qty)
       for (double i = 0; i < 3; i++) {
@@ -260,5 +261,21 @@ class PaymentCubit extends Cubit<PaymentStates> {
     cartTotalAfterDiscount = 0;
     result = ((cartTotalAfterDiscount == 0 ? cartTotal * 100 : cartTotalAfterDiscount * 100).toInt()).toString();
     emit(ClearDiscountStateSuccess());
+  }
+
+  void deleteItemOnCart(index) {
+    emit(DeleteItemStateLoading());
+    try {
+      cartItem.removeAt(index);
+      clearCoupon();
+      calcTotalItem();
+      cartSubTotal = calcTotalPriceOfItems();
+      cartTax = calcTax(tax: tax);
+      cartTotal = calcTotal(tax: tax);
+      emit(DeleteItemStateSuccess());
+    } catch (e) {
+      print(e);
+      emit(DeleteItemStateError());
+    }
   }
 }
